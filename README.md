@@ -21,14 +21,14 @@ cd ~/Projects/cachyos-mocha
 
 The script installs all packages in [`packages.txt`](packages.txt), backs up existing files, replaces the default configs, installs the theme assets, registers the login session, and configures services. `--yes` accepts pacman's package prompts; sudo may still request your password. Without `--yes`, pacman asks for confirmation.
 
-**Log out and choose “CachyOS Mocha” at login.** If you previously used a console login with no display manager, SDDM is enabled for your next boot; reboot to get the login screen. From a TTY, you can also launch `/usr/local/bin/cachyos-mocha-session` directly. The installer does not interrupt or reload your running desktop.
+**Choose “CachyOS Mocha” in Ly on tty2** (`Ctrl+Alt+F2`). The full installer starts Ly immediately with `sudo systemctl enable --now ly@tty2`. From a TTY, you can also launch `/usr/local/bin/cachyos-mocha-session` directly. The installer does not reload Hyprland or stop an existing graphical login manager, but starting Ly may switch the active virtual terminal.
 
 The full setup includes:
 
 - Hyprland, Waybar, Rofi, notifications, screen locking, screenshots, clipboard history, wallpaper selection, and a settings launcher.
 - Kitty, Zsh, your captured Powerlevel10k prompt, Firefox, Chromium, Nemo, a calculator, archive tools, file thumbnails, and removable-drive support.
 - Matching Mocha themes for GTK 3/4, Qt/Kvantum, Kitty, Ghostty, Alacritty, Fuzzel, Micro, Neovim, and btop; Bibata cursors and Papirus icons.
-- PipeWire/WirePlumber audio, NetworkManager, Bluetooth tools, screen-sharing portals, and SDDM when no other login manager is configured.
+- PipeWire/WirePlumber audio, NetworkManager, Bluetooth tools, screen-sharing portals, and Ly on tty2.
 - Your captured Cava, htop, editor, and alternate-terminal preferences.
 
 The music shortcut opens Spotify Web, so the full install needs no AUR helper. Neovim downloads its plugins on first launch. Your login shell is unchanged; Kitty launches the configured Zsh directly.
@@ -54,12 +54,12 @@ Use `--config-only --minimal` to omit editor and alternate-terminal configs, or 
 ./install.sh --config-only   # Install all configs/assets; skip packages, services and login registration
 ./install.sh --minimal       # Omit editor/alternate-terminal configs; package bundle remains complete
 ./install.sh --no-services   # Install files/packages/session, leaving service states alone
-./install.sh --no-session    # Skip the branded login entry and SDDM activation
+./install.sh --no-session    # Skip the branded login entry and Ly activation
 ```
 
 Clone outside the directories being replaced. Installation uses independent copies, so the repository can be moved later. Every reinstall makes a new backup. Existing `hypr/local.lua` overrides are preserved; other managed directories are replaced as a unit.
 
-NetworkManager and Bluetooth are enabled automatically, together with user audio services. If another network service is active, it is kept and NetworkManager is not enabled. An existing login manager is kept; otherwise SDDM is enabled for the next boot, never started over your current session. Explicitly masked network/Bluetooth/audio services stay masked. Choose `--no-services` to manage those yourself.
+NetworkManager and Bluetooth are enabled automatically, together with user audio services. If another network service is active, it is kept and NetworkManager is not enabled. The previous graphical login manager is disabled for future boots without stopping its running session. The installer disables/stops `getty@tty2.service` to free tty2, then runs `sudo systemctl enable --now ly@tty2`, following [Ly’s systemd setup](https://github.com/fairyglade/ly#systemd). Explicitly masked network/Bluetooth/audio services stay masked. Choose `--no-services` to manage those yourself.
 
 ## Daily use
 

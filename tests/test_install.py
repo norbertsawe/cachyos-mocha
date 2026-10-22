@@ -102,7 +102,7 @@ class InstallerTests(unittest.TestCase):
         self.assertTrue((self.config / 'hypr/hyprland.lua').exists())
         self.assertTrue((self.data / 'cachyos-mocha/wallpapers/catppuccin.png').exists())
 
-    def test_services_respect_existing_network_and_login_manager(self):
+    def test_services_keep_existing_network_and_enable_ly_on_tty2(self):
         module = self.load_module()
         def status(name, user=False):
             if name == 'systemd-networkd.service':
@@ -114,9 +114,37 @@ class InstallerTests(unittest.TestCase):
             module.configure_services(backup, install_session=True)
         calls = [c.args[0] for c in run.call_args_list]
         self.assertFalse(any('NetworkManager.service' in c for c in calls))
-        self.assertFalse(any('sddm.service' in c for c in calls))
+        self.assertIn(['sudo', 'systemctl', 'enable', '--now', 'ly@tty2'], calls)
+        self.assertIn(['sudo', 'systemctl', 'disable', '--now', 'getty@tty2.service'], calls)
         self.assertTrue(any('bluetooth.service' in c for c in calls))
         self.assertTrue(any('--user' in c and 'pipewire.socket' in c for c in calls))
+
+    def test_login_manager_migration_and_restore(self):
+        module = self.load_module()
+        backup = self.home / 'login-backup'
+        backup.mkdir()
+        def run_command(command, **kwargs):
+            stdout = 'sddm.service\n' if 'show' in command else ''
+            return subprocess.CompletedProcess(command, 0, stdout=stdout)
+        with patch.object(module, 'service_status', return_value=('enabled', 'active')), patch.object(module.subprocess, 'run', side_effect=run_command) as run:
+            module.configure_services(backup, install_session=True)
+            calls = [c.args[0] for c in run.call_args_list]
+            self.assertIn(['sudo', 'systemctl', 'disable', 'sddm.service'], calls)
+            self.assertFalse(any('stop' in c and 'sddm.service' in c for c in calls))
+            run.reset_mock()
+            module.restore_services(backup)
+            calls = [c.args[0] for c in run.call_args_list]
+            self.assertIn(['sudo', 'systemctl', 'enable', 'sddm.service'], calls)
+            self.assertIn(['sudo', 'systemctl', 'start', 'getty@tty2.service'], calls)
+
+    def test_no_session_skips_login_manager_changes(self):
+        module = self.load_module()
+        backup = self.home / 'no-session-backup'
+        backup.mkdir()
+        with patch.object(module, 'service_status', return_value=('disabled', 'inactive')), patch.object(module.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)) as run:
+            module.configure_services(backup, install_session=False)
+        calls = [c.args[0] for c in run.call_args_list]
+        self.assertFalse(any('ly@tty2' in c or 'getty@tty2.service' in c for c in calls))
 
     def test_restore_services_keeps_preexisting_active_services(self):
         module = self.load_module()

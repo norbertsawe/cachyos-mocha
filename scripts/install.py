@@ -60,13 +60,23 @@ def configure_services(backup, install_session):
     else:
         enable('NetworkManager.service')
     enable('bluetooth.service')
-    # Avoid enabling a competing login manager. SDDM starts on next boot.
-    display_manager = subprocess.run(['systemctl', 'is-enabled', 'display-manager.service'], capture_output=True)
-    if install_session and display_manager.returncode != 0:
-        enabled, active = service_status('sddm.service')
-        changes.append({'name': 'sddm.service', 'user': False, 'enabled': enabled, 'active': active})
-        (backup / 'services.json').write_text(json.dumps(changes, indent=2) + '\n')
-        subprocess.run(['sudo', 'systemctl', 'enable', 'sddm.service'], check=True)
+    if install_session:
+        def disable(name, stop=False):
+            enabled, active = service_status(name)
+            if enabled in ('masked', 'masked-runtime', 'not-found'):
+                return
+            changes.append({'name': name, 'user': False, 'enabled': enabled,
+                            'active': active, 'action': 'disable'})
+            (backup / 'services.json').write_text(json.dumps(changes, indent=2) + '\n')
+            subprocess.run(['sudo', 'systemctl', 'disable', *(['--now'] if stop else []), name], check=True)
+        manager = subprocess.run(['systemctl', 'show', '-p', 'Id', '--value',
+                                  'display-manager.service'], capture_output=True, text=True)
+        manager_name = (manager.stdout or '').strip()
+        if manager.returncode == 0 and manager_name.endswith('.service') and manager_name != 'display-manager.service' and not manager_name.startswith('ly@'):
+            # Keep the running desktop alive; prevent the old manager on next boot.
+            disable(manager_name)
+        disable('getty@tty2.service', stop=True)
+        enable('ly@tty2')
     for name in ['pipewire.socket', 'pipewire-pulse.socket', 'wireplumber.service']:
         enable(name, user=True)
 
@@ -79,6 +89,12 @@ def restore_services(backup, dry_run=False):
         if not rec['user']:
             command.insert(0, 'sudo')
         if not dry_run:
+            if rec.get('action') == 'disable':
+                if rec['enabled'] in ('enabled', 'enabled-runtime'):
+                    subprocess.run([*command, 'enable', *(['--runtime'] if rec['enabled'] == 'enabled-runtime' else []), rec['name']], check=False)
+                if rec['active'] == 'active':
+                    subprocess.run([*command, 'start', rec['name']], check=False)
+                continue
             if rec['active'] != 'active':
                 subprocess.run([*command, 'stop', rec['name']], check=False)
             if rec['enabled'] not in ('enabled', 'enabled-runtime', 'static', 'indirect', 'alias'):
@@ -151,7 +167,7 @@ def main():
         print(f'{src.relative_to(ROOT)} -> {target} (backup first)')
     if args.dry_run:
         if not args.config_only and not args.no_services:
-            print('Services: configure NetworkManager, Bluetooth and user audio; enable SDDM on boot if no login manager exists.')
+            print('Services: configure NetworkManager, Bluetooth and user audio; disable the old login manager at boot, free tty2, and run sudo systemctl enable --now ly@tty2.')
         print('Dry run: no files, packages, services, or desktop settings changed.')
         return
     if not args.config_only:
@@ -216,7 +232,7 @@ def main():
     if args.config_only or args.no_session:
         print('Log out and choose your existing Hyprland session to load the installed configs.')
     else:
-        print('Log out and select CachyOS Mocha at login, or reboot if a login manager was just enabled.')
+        print('Select CachyOS Mocha in Ly on tty2 (Ctrl+Alt+F2).')
     print('Check desktop readiness with ~/.local/bin/mocha-doctor.')
 
 if __name__ == '__main__':

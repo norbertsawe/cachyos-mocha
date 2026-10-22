@@ -47,7 +47,7 @@ ghostty
 fuzzel
 htop
 alacritty
-sddm
+ly
 xdg-user-dirs
 udiskie
 gvfs
