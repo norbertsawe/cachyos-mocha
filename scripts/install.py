@@ -89,7 +89,8 @@ def restore_services(backup, dry_run=False):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument('--dry-run', action='store_true', help='print changes without writing or installing')
-    ap.add_argument('--config-only', action='store_true', help='skip packages and version check')
+    ap.add_argument('--config-only', '--configs-only', dest='config_only', action='store_true',
+                    help='copy configs/assets only; skip packages, services, login registration and version checks')
     ap.add_argument('--extras', action='store_true', help=argparse.SUPPRESS)
     ap.add_argument('--minimal', action='store_true', help='omit editor and alternate-terminal configs')
     ap.add_argument('--no-services', action='store_true', help='leave system and audio services unchanged')

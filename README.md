@@ -33,6 +33,20 @@ The full setup includes:
 
 The music shortcut opens Spotify Web, so the full install needs no AUR helper. Neovim downloads its plugins on first launch. Your login shell is unchanged; Kitty launches the configured Zsh directly.
 
+## Configurations only
+
+Already have the tools installed? Copy just the configurations and appearance assets:
+
+```bash
+git clone https://github.com/norbertsawe/cachyos-mocha.git ~/Projects/cachyos-mocha
+cd ~/Projects/cachyos-mocha
+./install.sh --config-only
+```
+
+`--configs-only` is an equivalent alias. This mode **never installs additional packages**, runs sudo, changes services, or registers a system login session. It backs up and replaces the selected configs (including shell settings), copies the themes/wallpaper/helpers, and refreshes the font cache if available. It needs Python 3 already installed. Tools you do not have stay uninstalled; install them yourself only if you want to use their configs.
+
+Use `--config-only --minimal` to omit editor and alternate-terminal configs, or `--config-only --dry-run` to preview all destinations first. The usual backup and restore commands still apply.
+
 ## Installation controls
 
 ```bash

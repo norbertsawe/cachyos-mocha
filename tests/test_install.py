@@ -91,6 +91,17 @@ class InstallerTests(unittest.TestCase):
         spec.loader.exec_module(module)
         return module
 
+    def test_configs_only_alias_never_installs_tools_or_changes_services(self):
+        module = self.load_module()
+        with patch.dict(os.environ, self.env), patch('sys.argv', ['install.py', '--configs-only']), patch.object(module.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)) as run, patch.object(module.subprocess, 'check_output', side_effect=AssertionError('No external version checks in configs-only mode')):
+            module.main()
+        calls = [c.args[0] for c in run.call_args_list]
+        self.assertFalse(any(any(tool in c for tool in ['sudo', 'pacman', 'systemctl']) for c in calls))
+        self.assertFalse(any(rec.get('privileged') for rec in json.loads((self.backup() / 'manifest.json').read_text())))
+        self.assertFalse((self.backup() / 'services.json').exists())
+        self.assertTrue((self.config / 'hypr/hyprland.lua').exists())
+        self.assertTrue((self.data / 'cachyos-mocha/wallpapers/catppuccin.png').exists())
+
     def test_services_respect_existing_network_and_login_manager(self):
         module = self.load_module()
         def status(name, user=False):
