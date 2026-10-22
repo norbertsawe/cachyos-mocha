@@ -2,7 +2,7 @@
 
 **My personal desktop environment, built on Hyprland and Catppuccin Mocha.**
 
-A complete, installable desktop setup for CachyOS by [Norbert John Sawe](https://github.com/norbertsawe): translucent Waybar, mauve Rofi menus, green GTK/Kvantum accents, Kitty, Zsh/Powerlevel10k, matching utilities, and a dedicated **CachyOS Mocha** login session.
+A complete, installable desktop setup for CachyOS by [norbertsawe](https://github.com/norbertsawe): translucent Waybar, mauve Rofi menus, green GTK/Kvantum accents, Kitty, Zsh/Powerlevel10k, matching utilities, and a dedicated **CachyOS Mocha** login session.
 
 ![Included Catppuccin wallpaper](share/cachyos-mocha/wallpapers/catppuccin.png)
 
