@@ -49,7 +49,7 @@ class InstallerTests(unittest.TestCase):
         css = (self.config / 'gtk-4.0/gtk.css').read_text()
         self.assertIn((self.data / 'themes/catppuccin-mocha-green-standard+default/gtk-4.0/gtk.css').as_uri(), css)
         self.assertTrue(os.access(self.home / '.local/bin/mocha-wallpaper', os.X_OK))
-        self.assertFalse((self.config / 'nvim').exists())
+        self.assertTrue((self.config / 'nvim/init.lua').exists())
         self.run_installer('--config-only')
         second = self.backup()
         self.assertNotEqual(first, second)
@@ -59,12 +59,14 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual((self.config / 'waybar/sentinel').read_text(), 'original')
         self.assertFalse((self.config / 'kitty').exists())
         self.assertFalse((self.home / '.local/bin/mocha-wallpaper').exists())
+        with self.assertRaises(subprocess.CalledProcessError):
+            self.run_installer('--restore', str(first))
         self.assertEqual((self.config / 'hypr/local.lua').read_text(), '-- personal monitor override\n')
 
-    def test_extras(self):
-        self.run_installer('--config-only', '--extras')
-        self.assertTrue((self.config / 'nvim/init.lua').exists())
-        self.assertTrue((self.config / 'ghostty/config').exists())
+    def test_minimal(self):
+        self.run_installer('--config-only', '--minimal')
+        self.assertFalse((self.config / 'nvim').exists())
+        self.assertFalse((self.config / 'ghostty').exists())
 
     def test_failed_install_rolls_back(self):
         spec = importlib.util.spec_from_file_location('installer', ROOT / 'scripts/install.py')
@@ -81,6 +83,43 @@ class InstallerTests(unittest.TestCase):
         self.assertTrue((self.config / 'waybar').is_symlink())
         self.assertEqual((self.config / 'waybar/sentinel').read_text(), 'original')
         self.assertEqual((self.config / 'hypr/local.lua').read_text(), '-- personal monitor override\n')
+
+
+    def load_module(self):
+        spec = importlib.util.spec_from_file_location('installer', ROOT / 'scripts/install.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
+
+    def test_services_respect_existing_network_and_login_manager(self):
+        module = self.load_module()
+        def status(name, user=False):
+            if name == 'systemd-networkd.service':
+                return 'enabled', 'active'
+            return 'disabled', 'inactive'
+        backup = self.home / 'service-backup'
+        backup.mkdir()
+        with patch.object(module, 'service_status', side_effect=status), patch.object(module.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)) as run:
+            module.configure_services(backup, install_session=True)
+        calls = [c.args[0] for c in run.call_args_list]
+        self.assertFalse(any('NetworkManager.service' in c for c in calls))
+        self.assertFalse(any('sddm.service' in c for c in calls))
+        self.assertTrue(any('bluetooth.service' in c for c in calls))
+        self.assertTrue(any('--user' in c and 'pipewire.socket' in c for c in calls))
+
+    def test_restore_services_keeps_preexisting_active_services(self):
+        module = self.load_module()
+        backup = self.home / 'service-backup'
+        backup.mkdir()
+        (backup / 'services.json').write_text(json.dumps([
+            {'name': 'NetworkManager.service', 'user': False, 'enabled': 'enabled', 'active': 'active'},
+            {'name': 'bluetooth.service', 'user': False, 'enabled': 'disabled', 'active': 'inactive'}]))
+        with patch.object(module.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0)) as run:
+            module.restore_services(backup)
+        calls = [c.args[0] for c in run.call_args_list]
+        self.assertFalse(any('NetworkManager.service' in c for c in calls))
+        self.assertTrue(any('stop' in c and 'bluetooth.service' in c for c in calls))
+        self.assertTrue(any('disable' in c and 'bluetooth.service' in c for c in calls))
 
 if __name__ == '__main__':
     unittest.main()

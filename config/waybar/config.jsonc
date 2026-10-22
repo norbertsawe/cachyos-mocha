@@ -32,7 +32,8 @@
   "custom/applauncher": {
     "format": "  Apps",
     "tooltip": false,
-    "on-click": "rofi -show drun"
+    "on-click": "rofi -show drun",
+    "on-click-right": "~/.local/bin/mocha-settings"
   },
   "hyprland/window": {
     "format": "{}",

@@ -25,7 +25,7 @@ local terminal = "kitty"
 local fileManager = "nemo"
 local browser = "firefox"
 local chrome = "chromium"
-local music = "spotify"
+local music = "xdg-open https://open.spotify.com"
 local notion = "xdg-open https://notion.so"
 local ai = "xdg-open https://chatgpt.com"
 
@@ -48,6 +48,8 @@ local clipboardHistory = "cliphist list | rofi -dmenu | cliphist decode | wl-cop
 hl.on("hyprland.start", function()
 	hl.exec_cmd("~/.local/bin/mocha-wallpaper --restore")
 	hl.exec_cmd("mako")
+	hl.exec_cmd("udiskie --no-tray")
+	hl.exec_cmd("xdg-user-dirs-update")
 	hl.exec_cmd("waybar")
 	hl.exec_cmd("/usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1")
 
@@ -286,6 +288,9 @@ hl.bind(secondMod .. " + Space", hl.dsp.exec_cmd(runner))
 hl.bind(secondMod .. " + Return", hl.dsp.exec_cmd(calculator))
 hl.bind(secondMod .. " + E", hl.dsp.exec_cmd(emojiSearch))
 hl.bind(secondMod .. " + C", hl.dsp.exec_cmd(clipboardHistory))
+
+-- Desktop settings
+hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd("~/.local/bin/mocha-settings"))
 
 -- apps
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))

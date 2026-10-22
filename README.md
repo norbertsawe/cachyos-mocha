@@ -1,116 +1,126 @@
 # CachyOS Mocha
 
-A personal Hyprland desktop for CachyOS, built around Catppuccin Mocha: a compact translucent Waybar, mauve Rofi launcher, green GTK and Kvantum accents, Kitty, and Bibata cursors.
+**My personal desktop environment, built on Hyprland and Catppuccin Mocha.**
+
+A complete, installable desktop setup for CachyOS by [Norbert John Sawe](https://github.com/norbertsawe): translucent Waybar, mauve Rofi menus, green GTK/Kvantum accents, Kitty, Zsh/Powerlevel10k, matching utilities, and a dedicated **CachyOS Mocha** login session.
 
 ![Included Catppuccin wallpaper](share/cachyos-mocha/wallpapers/catppuccin.png)
 
-Captured from my CachyOS workstation with **Hyprland 0.56.2**. Uses the Lua configuration format; **Hyprland 0.55+ is required** ([configuration reference](https://wiki.hypr.land/Configuring/Start/)). This is a desktop configuration installer for an existing CachyOS installation, not an OS installer.
+Captured from my CachyOS workstation running **Hyprland 0.56.2**. Requires **Hyprland 0.55+**, which uses [Lua configuration](https://wiki.hypr.land/Configuring/Start/). This installs the desktop on an existing CachyOS system; it does not install the operating system or graphics drivers.
 
-## Install
+## Install everything
 
-Run as your normal user in an existing CachyOS installation with Python 3, Git, sudo access, and a working network:
+Run as your normal user, with sudo access and an internet connection:
 
 ```bash
 sudo pacman -Syu --needed git python
 git clone https://github.com/norbertsawe/cachyos-mocha.git ~/Projects/cachyos-mocha
 cd ~/Projects/cachyos-mocha
-./install.sh
+./install.sh --yes
 ```
 
-The installer updates the system and installs the packages listed in [`packages.txt`](packages.txt), using pacman's normal confirmation prompt. It stages the files, backs up existing destinations, then **replaces** the relevant configuration directories with independent copies. Existing `hypr/local.lua` overrides are preserved. It does not change your login manager or reload your current session. Log out and choose **Hyprland** at login after installation.
+The script installs all packages in [`packages.txt`](packages.txt), backs up existing files, replaces the default configs, installs the theme assets, registers the login session, and configures services. `--yes` accepts pacman's package prompts; sudo may still request your password. Without `--yes`, pacman asks for confirmation.
+
+**Log out and choose “CachyOS Mocha” at login.** If you previously used a console login with no display manager, SDDM is enabled for your next boot; reboot to get the login screen. From a TTY, you can also launch `/usr/local/bin/cachyos-mocha-session` directly. The installer does not interrupt or reload your running desktop.
+
+The full setup includes:
+
+- Hyprland, Waybar, Rofi, notifications, screen locking, screenshots, clipboard history, wallpaper selection, and a settings launcher.
+- Kitty, Zsh, your captured Powerlevel10k prompt, Firefox, Chromium, Nemo, a calculator, archive tools, file thumbnails, and removable-drive support.
+- Matching Mocha themes for GTK 3/4, Qt/Kvantum, Kitty, Ghostty, Alacritty, Fuzzel, Micro, Neovim, and btop; Bibata cursors and Papirus icons.
+- PipeWire/WirePlumber audio, NetworkManager, Bluetooth tools, screen-sharing portals, and SDDM when no other login manager is configured.
+- Your captured Cava, htop, editor, and alternate-terminal preferences.
+
+The music shortcut opens Spotify Web, so the full install needs no AUR helper. Neovim downloads its plugins on first launch. Your login shell is unchanged; Kitty launches the configured Zsh directly.
+
+## Installation controls
 
 ```bash
-./install.sh --dry-run      # Preview destinations without changing anything
-./install.sh --config-only  # Copy configs/assets; manage dependencies yourself
-./install.sh --extras       # Also install the captured editor/utility configs
+./install.sh --dry-run       # Preview files and service setup; change nothing
+./install.sh --config-only   # Install all configs/assets; skip packages, services and login registration
+./install.sh --minimal       # Omit editor/alternate-terminal configs; package bundle remains complete
+./install.sh --no-services   # Install files/packages/session, leaving service states alone
+./install.sh --no-session    # Skip the branded login entry and SDDM activation
 ```
 
-`--config-only` skips package and version checks. `--dry-run` also skips dependency installation. Clone outside the directories being replaced; `~/Projects/cachyos-mocha` is suitable. Re-running installation creates a new backup each time.
+Clone outside the directories being replaced. Installation uses independent copies, so the repository can be moved later. Every reinstall makes a new backup. Existing `hypr/local.lua` overrides are preserved; other managed directories are replaced as a unit.
 
-On a fresh installation, enable networking and Bluetooth if those services are not already enabled:
+NetworkManager and Bluetooth are enabled automatically, together with user audio services. If another network service is active, it is kept and NetworkManager is not enabled. An existing login manager is kept; otherwise SDDM is enabled for the next boot, never started over your current session. Explicitly masked network/Bluetooth/audio services stay masked. Choose `--no-services` to manage those yourself.
 
-```bash
-sudo systemctl enable --now NetworkManager.service
-sudo systemctl enable --now bluetooth.service
-```
+## Daily use
 
-Services are left under your control because an existing installation may use another network manager. Audio uses PipeWire/WirePlumber. Spotify is an optional application for `Super+M`; install it separately if wanted. Neovim's optional LazyVim setup downloads plugins on first launch.
-
-## Included
-
-| Component | Configuration |
-| --- | --- |
-| Hyprland | Lua config, dwindle layout, scrolling workspace 2, gestures, animations, portable monitor defaults |
-| Waybar | Original Mocha CSS, workspaces, window title, audio/mic, brightness, CPU/RAM, Wi-Fi/Bluetooth, battery, clock, updates, lock, session menu |
-| Rofi | Local Mocha theme, application/command launcher, clipboard and wallpaper menus |
-| Kitty | Catppuccin Mocha, JetBrainsMono Nerd Font, mauve cursor trail |
-| GTK 3/4 and GTK 2 settings | Bundled Catppuccin Mocha green theme, Papirus Dark icons |
-| Qt 5/6 | Qt settings and bundled Catppuccin Mocha green Kvantum theme |
-| Desktop | Bibata Modern Ice cursors, bundled current wallpaper, Mako notifications, working Hyprlock screen |
-| Optional `--extras` | Captured btop, Cava, Micro, Neovim, Ghostty, Fuzzel, htop, Alacritty configs |
-
-Optional configs preserve the workstation's app preferences; some still use other palettes. Browser profiles, shell history, credentials, clipboard contents, app sessions, and unrelated application settings are excluded.
-
-Compared with the original snapshot, username-specific paths and display/backlight restrictions are removed, missing helper scripts are supplied, duplicate shortcuts are resolved, and stale Matugen/Noctalia GTK overrides are replaced with the selected GTK theme. Waybar's app button now uses Rofi. The power button opens a menu with confirmation for logout, reboot, and shutdown.
-
-## Shortcuts
+Right-click **Apps** on Waybar, launch **CachyOS Mocha Settings**, or press **Super+,** for wallpaper, audio, network, Bluetooth, configuration, and health tools. Left-click Apps to launch applications. The power button opens a menu with confirmation before logout, reboot, or shutdown.
 
 | Keys | Action |
 | --- | --- |
-| `Super+Return` | Kitty |
+| `Super+Return` | Kitty / Zsh |
 | `Super+Space` / `Super+Shift+Space` | Applications / run command |
+| `Super+,` | Desktop settings |
 | `Super+E` / `Super+B` / `Super+C` | Nemo / Firefox / Chromium |
 | `Super+Shift+Return` | Calculator |
+| `Super+M` | Spotify Web |
 | `Super+Shift+E` / `Super+Shift+C` | Emoji / clipboard history |
 | `Super+Shift+W` | Wallpaper picker |
 | `Super+P` / `Super+Shift+P` | Window / region screenshot |
-| `Super+Escape` | Session menu (lock, suspend, logout, reboot, shutdown) |
+| `Super+Escape` | Session menu and lock |
 | `Super+Q` | Close window |
 | `Super+F` / `Super+Shift+F` | Maximize / toggle floating |
 | `Super+H/J/K/L` | Focus left/down/up/right |
 | `Super+Shift+H/J/K/L` | Move window |
 | `Super+1…0` / `Super+Shift+1…0` | Workspace / move window to workspace |
 
-Clipboard history is stored locally by cliphist after login; it is never part of this repository.
+Workspace 2 uses the scrolling layout; the others use dwindle. Audio, microphone, brightness, and media keys are configured. Clipboard history is stored locally by cliphist after login and is never included in this repository.
 
 ## Customize
 
-Edit files under `~/.config` after installation. Repository updates take effect only after running the installer again. Put monitor and other machine-specific overrides in `~/.config/hypr/local.lua`, which is preserved on reinstall:
+Edit the installed files under `~/.config`. Put machine-specific settings in `~/.config/hypr/local.lua`, which survives reinstall:
 
 ```lua
 hl.monitor({ output = "DP-1", mode = "1920x1080@60", position = "0x0", scale = "1" })
 ```
 
-Default display settings use each monitor's preferred mode. Waybar applies to all displays and detects backlight hardware. Modules needing hardware (battery, brightness, Bluetooth) may be unavailable on desktops without it; remove those modules from `waybar/config.jsonc` if desired.
+Default monitor settings use preferred modes; Waybar targets all monitors and detects backlight hardware. Modules requiring absent hardware may be unavailable: remove battery, brightness, or Bluetooth modules from `waybar/config.jsonc` if needed.
 
-Add wallpapers to `~/.local/share/cachyos-mocha/wallpapers` or `~/Pictures`, then press `Super+Shift+W`. The selected wallpaper is remembered under `~/.local/state/cachyos-mocha`. You can also run:
+Add wallpaper images to `~/.local/share/cachyos-mocha/wallpapers` or `~/Pictures`, then use the picker. The last selection is restored on login. You can also run:
 
 ```bash
 ~/.local/bin/mocha-wallpaper /absolute/path/to/image.png
+~/.local/bin/mocha-doctor
 ```
 
-The installer respects `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, and `XDG_STATE_HOME`, including GTK4's theme import. Scripts live in `~/.local/bin` and keybindings reference them directly. GTK4 applications that enforce their own styling may render differently. The bundled Catppuccin GTK port is archived upstream.
+The installer respects `XDG_CONFIG_HOME`, `XDG_DATA_HOME`, and `XDG_STATE_HOME`, including the GTK4 import. Helpers live in `~/.local/bin`; the system login wrapper lives in `/usr/local/bin`. GTK4 applications that enforce their own styling may differ. The bundled GTK port is archived upstream.
 
-## Restore
+## Back up and restore
 
-Each successful install prints its backup location and restore command. Backups contain a manifest and the original files, including original symlinks:
+Every successful install prints its backup path and restore command:
 
 ```bash
 ./install.sh --restore ~/.local/state/cachyos-mocha/backups/<timestamp>
 ```
 
-Restore saves the displaced installed files inside that backup's `displaced-*` directory, then puts the original configs back. Destinations that did not previously exist are removed. Restore backups in reverse installation order if undoing several installations. Each backup can be restored once. Packages remain installed; restore only affects captured files. Log out and back in afterward.
+Backups include original configs, shell preferences, replaced theme assets, original symlinks, any replaced session files, and the previous states of configured services. Restore saves displaced files under `displaced-*`, restores the original files, removes destinations that were previously absent, and undoes service activation introduced by that install. System files and services require sudo during restore. Packages remain installed.
+
+Restore multiple installs in reverse order. Each backup can be restored once. Log out and back in after restoration. Failed file installation rolls back already-replaced files. Browser profiles, passwords, shell history, clipboard contents, and unrelated personal app settings are excluded.
+
+## Repository layout
+
+```text
+config/       Desktop, terminal, shell, and utility settings
+bin/          Wallpaper, settings, session-menu, and health helpers
+session/      CachyOS Mocha login entry and session environment
+share/        Themes, cursors, current wallpaper, application launcher
+scripts/      Installer, backups, service setup, and restore
+packages.txt  Complete CachyOS package bundle
+```
 
 ## Validation
 
 ```bash
 python3 -m unittest discover -s tests -v
-bash -n install.sh bin/*
+bash -n install.sh bin/* session/cachyos-mocha-session
 Hyprland --verify-config -c "$PWD/config/hypr/hyprland.lua"
 ```
 
-Installer tests use temporary homes and custom XDG directories to check dry runs, repeated installation, symlink preservation, local overrides, restore, optional configs, and rollback after an injected copy failure. GitHub Actions runs installer tests and syntax checks. Hyprland validation was run locally on 0.56.2; a fresh OS installation and every optional application have not been tested end to end.
+Tests use temporary homes/custom XDG paths and mocked system services to verify installation, repeated replacement, preserved overrides, symlink restoration, rollback, minimal mode, and respect for existing services. GitHub Actions runs installer tests and syntax checks. Hyprland's parser was checked locally on 0.56.2 and package names checked against CachyOS repositories. A fresh OS install, real system-service transitions, and every included app have not been tested end to end.
 
-## Credits
-
-Personal configuration by [Norbert John Sawe](https://github.com/norbertsawe). This is an independent personal setup, unaffiliated with CachyOS, Hyprland, or Catppuccin. Third-party themes retain their own licenses; see [THIRD_PARTY.md](THIRD_PARTY.md) and [`licenses/`](licenses/).
+This is my independent personal desktop setup, unaffiliated with CachyOS, Hyprland, or Catppuccin. Third-party themes retain their licenses; see [credits and sources](THIRD_PARTY.md).

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+choice="$(printf 'Wallpaper\nAudio\nNetwork\nBluetooth\nDesktop configuration\nSystem health\nGuide and shortcuts\n' | rofi -dmenu -i -p 'CachyOS Mocha')" || exit 0
+case "$choice" in
+    Wallpaper) "$HOME/.local/bin/mocha-wallpaper" ;;
+    Audio) pavucontrol ;;
+    Network) nm-connection-editor ;;
+    Bluetooth) blueman-manager ;;
+    'Desktop configuration') nemo "${XDG_CONFIG_HOME:-$HOME/.config}/hypr" ;;
+    'System health') kitty --hold "$HOME/.local/bin/mocha-doctor" ;;
+    'Guide and shortcuts') xdg-open https://github.com/norbertsawe/cachyos-mocha#shortcuts ;;
+esac

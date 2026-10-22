@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check shell syntax
-        run: bash -n install.sh bin/*
+        run: bash -n install.sh bin/* session/cachyos-mocha-session
       - name: Test installation and recovery
         run: python3 -m unittest discover -s tests -v
       - name: Parse Waybar configuration

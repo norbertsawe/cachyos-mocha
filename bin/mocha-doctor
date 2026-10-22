@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -uo pipefail
+failed=0
+for tool in Hyprland waybar kitty rofi hyprlock hyprshot awww cliphist wl-copy wpctl playerctl nemo firefox mako; do
+    if command -v "$tool" >/dev/null; then printf 'OK       %s\n' "$tool";
+    else printf 'MISSING  %s\n' "$tool"; failed=1; fi
+done
+for service in NetworkManager bluetooth; do
+    printf '%-18s %s\n' "$service" "$(systemctl is-active "$service" 2>/dev/null || true)"
+done
+printf '\nHyprland configuration:\n'
+Hyprland --verify-config -c "${XDG_CONFIG_HOME:-$HOME/.config}/hypr/hyprland.lua" || failed=1
+exit "$failed"
