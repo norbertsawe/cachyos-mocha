@@ -213,7 +213,10 @@ def main():
         subprocess.run(['fc-cache', '-f'], check=False)
     print(f'Installed. Backup: {backup}')
     print(f'Restore: ./install.sh --restore {backup}')
-    print('Log out and select CachyOS Mocha at login, or reboot if a login manager was just enabled.')
+    if args.config_only or args.no_session:
+        print('Log out and choose your existing Hyprland session to load the installed configs.')
+    else:
+        print('Log out and select CachyOS Mocha at login, or reboot if a login manager was just enabled.')
     print('Check desktop readiness with ~/.local/bin/mocha-doctor.')
 
 if __name__ == '__main__':
