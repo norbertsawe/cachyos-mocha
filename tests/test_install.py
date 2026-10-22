@@ -1,0 +1,86 @@
+"""Exercise real file replacement and recovery inside an isolated home."""
+import importlib.util
+import json
+import os
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[1]
+
+class InstallerTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.home = Path(self.temp.name)
+        self.config = self.home / 'custom config'
+        self.data = self.home / 'custom data'
+        self.state = self.home / 'state'
+        self.env = dict(os.environ, HOME=str(self.home), XDG_CONFIG_HOME=str(self.config),
+                        XDG_DATA_HOME=str(self.data), XDG_STATE_HOME=str(self.state))
+        self.config.mkdir()
+        original = self.home / 'original-waybar'
+        original.mkdir()
+        (original / 'sentinel').write_text('original')
+        (self.config / 'waybar').symlink_to(original, target_is_directory=True)
+        (self.config / 'hypr').mkdir()
+        (self.config / 'hypr/local.lua').write_text('-- personal monitor override\n')
+
+    def run_installer(self, *args):
+        return subprocess.run(['bash', str(ROOT / 'install.sh'), *args], env=self.env,
+                              text=True, capture_output=True, check=True)
+
+    def backup(self):
+        return sorted((self.state / 'cachyos-mocha/backups').iterdir())[-1]
+
+    def test_dry_run_writes_nothing(self):
+        self.run_installer('--dry-run')
+        self.assertFalse(self.state.exists())
+        self.assertFalse(self.data.exists())
+        self.assertTrue((self.config / 'waybar').is_symlink())
+
+    def test_replace_repeat_restore_and_xdg_paths(self):
+        self.run_installer('--config-only')
+        first = self.backup()
+        self.assertFalse((self.config / 'waybar').is_symlink())
+        self.assertEqual((self.config / 'hypr/local.lua').read_text(), '-- personal monitor override\n')
+        css = (self.config / 'gtk-4.0/gtk.css').read_text()
+        self.assertIn((self.data / 'themes/catppuccin-mocha-green-standard+default/gtk-4.0/gtk.css').as_uri(), css)
+        self.assertTrue(os.access(self.home / '.local/bin/mocha-wallpaper', os.X_OK))
+        self.assertFalse((self.config / 'nvim').exists())
+        self.run_installer('--config-only')
+        second = self.backup()
+        self.assertNotEqual(first, second)
+        self.run_installer('--restore', str(second))
+        self.run_installer('--restore', str(first))
+        self.assertTrue((self.config / 'waybar').is_symlink())
+        self.assertEqual((self.config / 'waybar/sentinel').read_text(), 'original')
+        self.assertFalse((self.config / 'kitty').exists())
+        self.assertFalse((self.home / '.local/bin/mocha-wallpaper').exists())
+        self.assertEqual((self.config / 'hypr/local.lua').read_text(), '-- personal monitor override\n')
+
+    def test_extras(self):
+        self.run_installer('--config-only', '--extras')
+        self.assertTrue((self.config / 'nvim/init.lua').exists())
+        self.assertTrue((self.config / 'ghostty/config').exists())
+
+    def test_failed_install_rolls_back(self):
+        spec = importlib.util.spec_from_file_location('installer', ROOT / 'scripts/install.py')
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        original_move = module.shutil.move
+        def failing_move(src, dst, *args, **kwargs):
+            if 'mocha-stage-' in str(src) and Path(dst) == self.config / 'waybar':
+                raise OSError('simulated interrupted copy')
+            return original_move(src, dst, *args, **kwargs)
+        with patch.dict(os.environ, self.env), patch('sys.argv', ['install.py', '--config-only']), patch.object(module.shutil, 'move', side_effect=failing_move):
+            with self.assertRaisesRegex(OSError, 'simulated'):
+                module.main()
+        self.assertTrue((self.config / 'waybar').is_symlink())
+        self.assertEqual((self.config / 'waybar/sentinel').read_text(), 'original')
+        self.assertEqual((self.config / 'hypr/local.lua').read_text(), '-- personal monitor override\n')
+
+if __name__ == '__main__':
+    unittest.main()

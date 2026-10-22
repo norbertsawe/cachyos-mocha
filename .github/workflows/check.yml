@@ -1,0 +1,15 @@
+name: Validate dotfiles
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  installer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check shell syntax
+        run: bash -n install.sh bin/*
+      - name: Test installation and recovery
+        run: python3 -m unittest discover -s tests -v
+      - name: Parse Waybar configuration
+        run: python3 -m json.tool config/waybar/config.jsonc > /dev/null
