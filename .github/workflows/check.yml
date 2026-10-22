@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install desktop entry validator
+        run: sudo apt-get update -qq && sudo apt-get install -y desktop-file-utils
+      - name: Validate launchers
+        run: desktop-file-validate share/applications/*.desktop session/*.desktop
       - name: Check shell syntax
         run: bash -n install.sh bin/* session/cachyos-mocha-session
       - name: Test installation and recovery

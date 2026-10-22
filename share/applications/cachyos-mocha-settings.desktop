@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=CachyOS Mocha Settings
 Comment=Wallpaper, sound, connectivity, and desktop tools
-Exec=sh -c "$HOME/.local/bin/mocha-settings"
+Exec=sh -c "\\$HOME/.local/bin/mocha-settings"
 Icon=preferences-desktop
 Type=Application
 Categories=Settings;DesktopSettings;

@@ -4,5 +4,4 @@ Comment=Norbert's Catppuccin Mocha desktop
 Exec=/usr/local/bin/cachyos-mocha-session
 TryExec=/usr/local/bin/cachyos-mocha-session
 Type=Application
-DesktopNames=Hyprland
 Keywords=desktop;tiling;wayland;catppuccin;
