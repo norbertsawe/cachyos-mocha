@@ -1,97 +1,116 @@
-/* ROFI SQUARED THEME USING THE CATPPUCCIN MOCHA PALETTE */
-/* Author: Newman Sanchez (https://github.com/newmanls) - Adapted for Catppuccin Mocha */
+/* Adapted from Newman Sanchez Rofi themes; see THIRD_PARTY.md. */
+/* ROFI ROUNDED COLORFUL THEME - CATPPUCCIN MOCHA */
 
 * {
-    font:    "JetBrainsMono Nerd Font Bold 12";
+    font:               "JetBrainsMono Nerd Font Bold 13";
 
-    /* Catppuccin Mocha Palette Mapping */
-    bg0:       #1e1e2e; /* Base */
-    bg1:       #313244; /* Surface0 */
-    fg0:       #cdd6f4; /* Text */
+    /* Catppuccin Mocha Colors */
+    bg0:                #1e1e2e; /* Base */
+    bg1:                #181825; /* Mantle */
+    bg2:                #313244; /* Surface0 */
+    fg0:                #cdd6f4; /* Text */
+    fg1:                #a6adc8; /* Subtext0 */
 
-    accent-color:       #cba6f7; /* Mauve */
-    urgent-color:       #f9e2af; /* Yellow */
+    accent-mauve:       #cba6f7;
+    accent-pink:        #f5c2e7;
+    accent-blue:        #89b4fa;
+    accent-sapphire:    #74c7ec;
+    accent-green:       #a6e3a1;
+    accent-peach:       #fab387;
+    accent-red:         #f38ba8;
 
-    background-color:     transparent;
-    text-color:           @fg0;
+    background-color:   transparent;
+    text-color:         @fg0;
 
-    margin:       0;
-    padding:      0;
-    spacing:      0;
+    margin:             0;
+    padding:            0;
+    spacing:            0;
 }
 
 window {
-    location:     center;
-    width:        480;
+    location:           center;
+    width:              520px;
+    border-radius:      20px;
+    border:             1px;
+    border-color:       rgba(203, 166, 247, 0.6); /* Semi-transparent Mauve border */
+    background-color:   @bg0;
+    padding:            12px;
+}
 
-    background-color:     @bg0;
+mainbox {
+    spacing:            10px;
 }
 
 inputbar {
-    spacing:      8px;
-    padding:      8px;
-
-    background-color:     @bg1;
-}
-
-prompt, entry, element-icon, element-text {
-    vertical-align: 0.5;
+    spacing:            10px;
+    padding:            10px 14px;
+    border-radius:      14px;
+    background-color:   @bg2;
+    children:           [ prompt, entry ];
 }
 
 prompt {
-    text-color: @accent-color;
+    text-color:         @accent-pink;
+    vertical-align:     0.5;
 }
 
-textbox {
-    padding:              8px;
-    background-color:     @bg1;
+entry {
+    placeholder:        "Search...";
+    placeholder-color:  @fg1;
+    text-color:         @fg0;
+    vertical-align:     0.5;
 }
 
 listview {
-    padding:      4px 0;
-    lines:        8;
-    columns:      1;
-
-    fixed-height: false;
+    padding:            4px 0px;
+    lines:              8;
+    columns:            1;
+    spacing:            6px;
+    fixed-height:       false;
 }
 
 element {
-    padding:      8px;
-    spacing:      8px;
+    padding:            10px 14px;
+    spacing:            10px;
+    border-radius:      12px;
 }
 
 element normal normal {
-    text-color: @fg0;
+    background-color:   transparent;
+    text-color:         @fg0;
 }
 
 element normal urgent {
-    text-color: @urgent-color;
+    background-color:   transparent;
+    text-color:         @accent-red;
 }
 
 element normal active {
-    text-color: @accent-color;
+    background-color:   transparent;
+    text-color:         @accent-sapphire;
 }
 
-element alternate active {
-    text-color: @accent-color;
+element selected normal {
+    background-color:   @accent-mauve;
+    text-color:         @bg1;
 }
 
-element selected {
-    text-color: @bg0;
-}
-
-element selected normal, element selected active {
-    background-color:     @accent-color;
+element selected active {
+    background-color:   @accent-sapphire;
+    text-color:         @bg1;
 }
 
 element selected urgent {
-    background-color:     @urgent-color;
+    background-color:   @accent-red;
+    text-color:         @bg1;
 }
 
 element-icon {
-    size:     0.8em;
+    size:               1.2em;
+    vertical-align:     0.5;
 }
 
 element-text {
-    text-color: inherit;
+    text-color:         inherit;
+    vertical-align:     0.5;
 }

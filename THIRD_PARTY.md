@@ -9,7 +9,7 @@ These assets were captured from the workstation; they are credited to their upst
 | `config/Kvantum/catppuccin-mocha-green` | [Catppuccin Kvantum](https://github.com/catppuccin/kvantum) | MIT; `licenses/catppuccin-kvantum.txt` |
 | `config/btop/themes/catppuccin_mocha.theme` | [Catppuccin btop](https://github.com/catppuccin/btop) | MIT; `licenses/catppuccin-btop.txt` |
 | `config/kitty/current-theme.conf` | [Catppuccin Kitty](https://github.com/catppuccin/kitty), Pocco81 | MIT; `licenses/catppuccin-kitty.txt` |
-| `config/rofi/mocha.rasi` | Captured Mocha adaptation of [Newman Sanchez's Rofi themes](https://github.com/newmanls/rofi-themes-collection) | GPL-3.0; `licenses/rofi-themes.txt`; original author comment preserved |
+| `config/rofi/mocha.rasi` | Captured Mocha adaptation of [Newman Sanchez's Rofi themes](https://github.com/newmanls/rofi-themes-collection) | GPL-3.0; `licenses/rofi-themes.txt`; attribution retained in the theme header |
 | `share/cachyos-mocha/wallpapers/catppuccin.png` | Current workstation wallpaper, Catppuccin mascot artwork | Original downloaded filename `12259301.png`; precise wallpaper author/source was not recorded. No exclusive ownership claimed. |
 | Catppuccin palettes and Micro themes | [Catppuccin](https://github.com/catppuccin/catppuccin) | MIT; `licenses/catppuccin.txt` |
 | `config/nvim` | [LazyVim starter](https://github.com/LazyVim/starter) and captured preferences | Included `config/nvim/LICENSE` |

@@ -1,236 +1,143 @@
-@import "colors.css";
-
 /* ================= CATPPUCCIN MOCHA PALETTE ================= */
 @define-color base      #1e1e2e;
 @define-color mantle    #181825;
 @define-color crust     #11111b;
 
 @define-color text      #cdd6f4;
-@define-color subtext1  #bac2de;
-@define-color subtext0  #a6adc8;
-
-@define-color overlay2  #9399b2;
-@define-color overlay1  #7f849c;
-@define-color overlay0  #6c7086;
-
-@define-color surface2  #585b70;
-@define-color surface1  #45475a;
 @define-color surface0  #313244;
+@define-color surface1  #45475a;
 
-@define-color lavender #b4befe;
-@define-color blue     #89b4fa;
-@define-color sapphire #74c7ec;
-@define-color sky      #89dceb;
-@define-color teal     #94e2d5;
-@define-color green    #a6e3a1;
-@define-color yellow   #f9e2af;
-@define-color peach    #fab387;
-@define-color maroon   #eba0ac;
-@define-color red      #f38ba8;
-@define-color mauve    #cba6f7;
-@define-color pink     #f5c2e7;
+@define-color lavender  #b4befe;
+@define-color blue      #89b4fa;
+@define-color sapphire  #74c7ec;
+@define-color teal      #94e2d5;
+@define-color green     #a6e3a1;
+@define-color yellow    #f9e2af;
+@define-color peach     #fab387;
+@define-color red       #f38ba8;
+@define-color mauve     #cba6f7;
+@define-color pink      #f5c2e7;
 @define-color flamingo #f2cdcd;
-@define-color rosewater #f5e0dc;
-
-/* Mapping functional dynamic values */
-@define-color color1   @mauve;
-@define-color color2   @sapphire;
-@define-color color3   @red;
-@define-color color4   @green;
-@define-color color5   @peach;
-@define-color color6   @lavender;
 
 * {
   border: none;
   border-radius: 0;
-  font-family: "JetBrainsMono Nerd Font";
+  font-family: "JetBrainsMono Nerd Font", "Noto Sans";
   font-weight: bold;
-  font-size: 16px;
+  font-size: 15px;
   min-height: 0;
 }
 
+/* Outer Waybar Container */
 window#waybar {
-  background: alpha(@surface0, 0.6);
+  background: alpha(@mantle, 0.95);
   color: @text;
-  border-radius: 10px;
+  border: 1px solid alpha(@mauve, 0.6);
+  border-radius: 20px; /* Maximized bar corners */
+  padding: 0;
 }
 
-/* ================= BASE ================= */
-
+/* Base reset for edge-to-edge block segments */
 #custom-applauncher,
-#workspaces,
+#window,
 #clock,
-#pulseaudio,
-#custom-microphone,
-#backlight,
-#cpu,
-#memory,
-#custom-network,
-#custom-bluetooth,
-#battery,
 #custom-pacman,
-#custom-lock,
-#custom-power,
-#window {
-  background-color: alpha(@surface0, 0.6);
-  padding: 0.22rem 0.4rem;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  margin-left: 0;
-  margin-right: 0;
-  box-shadow: none;
-  border: none;
+#cpu,
+#custom-network,
+#pulseaudio,
+#battery,
+#custom-power {
+  margin: 0;
+  padding: 4px 14px;
+  border-radius: 0;
 }
 
-/* ================= LEFT ================= */
+/* ================= LEFT BLOCK ================= */
 
 #custom-applauncher {
-  color: @mauve;
-  border-radius: 0.5rem;
-  margin-left: 0.4rem;
-  margin-right: 2rem;
-  padding: 0.38rem 0.7rem;
+  background-color: @pink;
+  color: @crust;
+  font-weight: 900;
+  border-top-left-radius: 9999px;    /* Maximized pill curve */
+  border-bottom-left-radius: 9999px; /* Maximized pill curve */
+  padding: 4px 16px;
 }
 
 #window {
-  color: @text;
-  background: transparent;
-  padding: 0.3rem 0.4rem;
+  background-color: @peach;
+  color: @crust;
 }
 
-/* ================= WORKSPACES ================= */
+#clock {
+  background-color: @green;
+  color: @crust;
+  border-radius: 0; /* Flat right edge */
+}
+
+/* ================= CENTER WORKSPACES (RADIO BUTTON STYLE) ================= */
 
 #workspaces {
-  border-radius: 0.5rem;
-  margin-left: 1rem;
-  padding: 0 0.35rem;
+  background-color: @blue;
+  padding: 0 4px;
+  margin: 0;
+  border-radius: 0;
 }
 
 #workspaces button {
-  color: @surface1;
-  border-radius: 0.7rem;
-  padding: 0 0.35rem;
+  color: @crust;
+  padding: 4px 6px;
   margin: 0;
+  border-radius: 0;
+  background-color: transparent;
+  transition: all 0.2s ease-in-out;
 }
 
 #workspaces button label {
-  font-size: 22px;
+  font-size: 15px;
+}
+
+/* Radio button ring style for buttons */
+#workspaces button:hover {
+  background-color: alpha(@crust, 0.15);
 }
 
 #workspaces button.active {
-  color: @mauve;
+  color: @crust;
+  background-color: transparent;
 }
 
-#workspaces button:hover {
-  color: @sapphire;
+/* ================= RIGHT BLOCK ================= */
+
+#custom-pacman {
+  background-color: @mauve;
+  color: @crust;
+  border-radius: 0; /* Flat left edge */
 }
-
-/* ================= CLOCK ================= */
-
-#clock {
-  color: @blue;
-  border-radius: 0.7rem;
-  padding: 0.38rem 0.8rem;
-  margin-right: 1rem;
-}
-
-/* ================= AUDIO BLOCK ================= */
-
-#pulseaudio {
-  color: @teal;
-  border-radius: 0.5rem 0 0 0.5rem;
-  padding-left: 1rem;
-  padding-right: 0.45rem;
-}
-
-#custom-microphone {
-  color: @teal;
-  border-radius: 0;
-  padding-left: 0.45rem;
-  padding-right: 0.45rem;
-}
-
-#backlight {
-  color: @yellow;
-  border-radius: 0 0.5rem 0.5rem 0;
-  padding-left: 0.45rem;
-  padding-right: 1rem;
-  margin-right: 1rem;
-}
-
-/* ================= STATS BLOCK ================= */
 
 #cpu {
-  color: @sapphire;
-  border-radius: 0.5rem 0 0 0.5rem;
-  padding-left: 1rem;
-  padding-right: 0.45rem;
+  background-color: @lavender;
+  color: @crust;
 }
-
-#memory {
-  color: @sky;
-  border-radius: 0 0.5rem 0.5rem 0;
-  padding-left: 0.45rem;
-  padding-right: 1rem;
-  margin-right: 1rem;
-}
-
-/* ================= NETWORK BLOCK ================= */
 
 #custom-network {
-  color: @lavender;
-  border-radius: 0.5rem 0 0 0.5rem;
-  padding-left: 1rem;
-  padding-right: 0.6rem;
+  background-color: @sapphire;
+  color: @crust;
 }
 
-#custom-bluetooth {
-  color: @lavender;
-  border-radius: 0;
-  padding-left: 0.35rem;
-  padding-right: 0.6rem;
+#pulseaudio {
+  background-color: @yellow;
+  color: @crust;
 }
 
 #battery {
-  color: @green;
-  border-radius: 0 0.5rem 0.5rem 0;
-  padding-left: 0.6rem;
-  padding-right: 1rem;
-  margin-right: 1rem;
-}
-
-#battery.charging {
-  color: @green;
-}
-
-#battery.warning:not(.charging) {
-  color: @peach;
-}
-
-#battery.critical:not(.charging) {
-  color: @red;
-}
-
-/* ================= ACTIONS BLOCK ================= */
-
-#custom-pacman {
-  color: @peach;
-  border-radius: 0.5rem 0 0 0.5rem;
-  padding-left: 1rem;
-  padding-right: 0.45rem;
-}
-
-#custom-lock {
-  color: @mauve;
-  border-radius: 0;
-  padding-left: 0.45rem;
-  padding-right: 0.45rem;
+  background-color: @peach;
+  color: @crust;
 }
 
 #custom-power {
-  color: @red;
-  border-radius: 0 0.5rem 0.5rem 0;
-  padding-left: 0.45rem;
-  padding-right: 1rem;
-  margin-right: 0.4rem;
+  background-color: @red;
+  color: @crust;
+  border-top-right-radius: 9999px;    /* Maximized pill curve */
+  border-bottom-right-radius: 9999px; /* Maximized pill curve */
+  padding: 4px 16px;
 }

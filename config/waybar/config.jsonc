@@ -2,37 +2,32 @@
   "layer": "top",
   "position": "top",
   "mode": "dock",
-  "height": 40,
+  "height": 38,
   "exclusive": true,
   "passthrough": false,
-  "margin-top": 5,
-  "margin-left": 5,
-  "margin-right": 5,
+  "margin-top": 6,
+  "margin-left": 10,
+  "margin-right": 10,
   "modules-left": [
     "custom/applauncher",
-    "hyprland/window"
+    "hyprland/window",
+    "clock"
   ],
   "modules-center": [
     "hyprland/workspaces"
   ],
   "modules-right": [
-    "pulseaudio",
-    "custom/microphone",
-    "backlight",
-    "cpu",
-    "memory",
-    "custom/network",
-    "custom/bluetooth",
-    "battery",
-    "clock",
     "custom/pacman",
-    "custom/lock",
+    "cpu",
+    "custom/network",
+    "pulseaudio",
+    "battery",
     "custom/power"
   ],
   "custom/applauncher": {
     "format": "  Apps",
     "tooltip": false,
-    "on-click": "rofi -show drun",
+    "on-click": "rofi -show drun -show-icons",
     "on-click-right": "~/.local/bin/mocha-settings"
   },
   "hyprland/window": {
@@ -41,7 +36,7 @@
       "(.*) — Mozilla Firefox": "$1",
       "(.*) - Mozilla Firefox": "$1"
     },
-    "max-length": 40,
+    "max-length": 25,
     "separate-outputs": true
   },
   "hyprland/workspaces": {
@@ -49,7 +44,8 @@
     "all-outputs": true,
     "format": "{icon}",
     "format-icons": {
-      "default": "●"
+      "active": "◉",
+      "default": "○"
     },
     "persistent-workspaces": {
       "*": 3
@@ -58,13 +54,30 @@
   "clock": {
     "tooltip": false,
     "interval": 60,
-    "format": "{:%H:%M}",
-    "format-alt": "{:%A %d %B}"
+    "format": "{:%H:%M  |  %d %b}",
+    "format-alt": "{:%A, %B %d, %Y}"
+  },
+  "custom/pacman": {
+    "format": "󰮯",
+    "tooltip": false,
+    "on-click": "kitty -e bash -lc 'sudo pacman -Syu; read -n 1 -s -r'"
+  },
+  "cpu": {
+    "interval": 2,
+    "format": " {usage}%"
+  },
+  "custom/network": {
+    "exec": "bash -c 'if [ \"$(nmcli -t -f WIFI g)\" = \"disabled\" ]; then echo \"󰖪 off\"; else ssid=$(nmcli -t -f TYPE,STATE,CONNECTION dev status | grep \"^wifi:connected:\" | cut -d: -f3- | head -n1); if [ -n \"$ssid\" ] && [ \"$ssid\" != \"--\" ]; then echo \" $ssid\"; else echo \" on\"; fi; fi'",
+    "interval": 3,
+    "tooltip": false,
+    "return-type": "text",
+    "on-click": "bash -c 'if [ \"$(nmcli -t -f WIFI g)\" = \"enabled\" ]; then nmcli radio wifi off; else nmcli radio wifi on; fi'",
+    "on-click-right": "nm-connection-editor"
   },
   "pulseaudio": {
     "tooltip": false,
     "scroll-step": 5,
-    "format": "{icon}  {volume}%",
+    "format": "{icon} {volume}%",
     "format-muted": "󰖁 Muted",
     "format-icons": {
       "default": [
@@ -75,44 +88,6 @@
     },
     "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle",
     "on-click-right": "pavucontrol"
-  },
-  "custom/microphone": {
-    "tooltip": false,
-    "exec": "wpctl get-volume @DEFAULT_AUDIO_SOURCE@ | awk '{ if ($0 ~ /MUTED/) print \"󰍭 Muted\"; else printf \"󰍬 %d%%\", int($2*100) }'",
-    "interval": 2,
-    "return-type": "text",
-    "on-click": "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle",
-    "on-click-right": "pavucontrol"
-  },
-  "backlight": {
-    "tooltip": false,
-    "format": "󰃠  {percent}%",
-    "scroll-step": 5
-  },
-  "cpu": {
-    "interval": 2,
-    "format": "  {usage}%"
-  },
-  "memory": {
-    "interval": 2,
-    "format": "  {}%",
-    "format-alt": "  {used} GiB"
-  },
-  "custom/network": {
-    "exec": "bash -c 'if [ \"$(nmcli -t -f WIFI g)\" = \"disabled\" ]; then echo \"󰖪  off\"; else ssid=$(nmcli -t -f TYPE,STATE,CONNECTION dev status | grep \"^wifi:connected:\" | cut -d: -f3- | head -n1); if [ -n \"$ssid\" ] && [ \"$ssid\" != \"--\" ]; then echo \"  $ssid\"; else echo \"  on\"; fi; fi'",
-    "interval": 3,
-    "tooltip": false,
-    "return-type": "text",
-    "on-click": "bash -c 'if [ \"$(nmcli -t -f WIFI g)\" = \"enabled\" ]; then nmcli radio wifi off; else nmcli radio wifi on; fi'",
-    "on-click-right": "nm-connection-editor"
-  },
-  "custom/bluetooth": {
-    "exec": "bash -c 'if rfkill list bluetooth | grep -q \"Soft blocked: yes\"; then echo \" off\"; else dev=$(bluetoothctl devices Connected | cut -d\" \" -f3- | head -n1); if [ -n \"$dev\" ]; then echo \" $dev\"; else echo \" on\"; fi; fi'",
-    "interval": 3,
-    "tooltip": false,
-    "return-type": "text",
-    "on-click": "bash -c 'if rfkill list bluetooth | grep -q \"Soft blocked: yes\"; then rfkill unblock bluetooth; else rfkill block bluetooth; fi'",
-    "on-click-right": "blueman-manager"
   },
   "battery": {
     "tooltip": false,
@@ -132,16 +107,6 @@
       "󰂂",
       "󰁹"
     ]
-  },
-  "custom/pacman": {
-    "format": "󰮯",
-    "tooltip": false,
-    "on-click": "kitty -e bash -lc 'sudo pacman -Syu; read -n 1 -s -r'"
-  },
-  "custom/lock": {
-    "format": "",
-    "tooltip": false,
-    "on-click": "hyprlock"
   },
   "custom/power": {
     "format": "",

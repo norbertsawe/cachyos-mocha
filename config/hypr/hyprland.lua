@@ -65,8 +65,8 @@ end)
 
 -- See https://wiki.hypr.land/Configuring/Advanced-and-Cool/Environment-variables/
 
-hl.env("XCURSOR_SIZE", "30")
-hl.env("HYPRCURSOR_SIZE", "30")
+hl.env("XCURSOR_SIZE", "24")
+hl.env("HYPRCURSOR_SIZE", "24")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_QPA_PLATFORMTHEME", "qt6ct")
 hl.env("QT_STYLE_OVERRIDE", "kvantum")
@@ -101,14 +101,14 @@ hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
 
 -- Fixed Catppuccin Mocha palette.
 local colors = {
-    active_border = "rgba(cba6f7ee)",
+    active_border = "rgba(cba6f7ff)",
     inactive_border = "rgba(313244aa)",
 }
 
 hl.config({
 	general = {
-		gaps_in = 3,
-		gaps_out = 6,
+		gaps_in = 5,
+		gaps_out = 10,
 
 		border_size = 3,
 		col = { active_border = colors.active_border, inactive_border = colors.inactive_border },
@@ -128,7 +128,7 @@ hl.config({
 			enabled = true,
 			range = 4,
 			render_power = 3,
-			color = "rgba(11111b1a)",
+			color = "rgba(11111b22)",
 		},
 
 		blur = {
@@ -294,7 +294,8 @@ hl.bind(mainMod .. " + comma", hl.dsp.exec_cmd("~/.local/bin/mocha-settings"))
 
 -- apps
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
-hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(chrome))
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(calculator))
+hl.bind(secondMod .. " + B", hl.dsp.exec_cmd(chrome))
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music))
@@ -304,10 +305,11 @@ hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(ai))
 hl.bind(secondMod .. " + W", hl.dsp.exec_cmd("~/.local/bin/mocha-wallpaper"))
 
 --locking screen using hyprlock
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("hyprlock"))
 
 --screenshots using hyprshot
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprshot --mode window"))
-hl.bind(secondMod .. " + P", hl.dsp.exec_cmd("hyprshot --mode region"))
+hl.bind(secondMod .. " + P", hl.dsp.exec_cmd("hyprshot --mode region --freeze"))
 
 -- hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + O", hl.dsp.layout("togglesplit")) -- dwindle only
